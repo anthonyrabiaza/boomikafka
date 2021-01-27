@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="boomikafka:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/boomikafka_jar</output-path>
+    <root id="archive" name="boomikafka.jar">
+      <element id="module-output" name="boomikafka" />
+      <element id="library" level="module" name="kafka-clients-1.0.1-kafka-3.1.1.jar" module-name="boomikafka" />
+    </root>
+  </artifact>
+</component>

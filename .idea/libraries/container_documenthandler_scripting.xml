@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="container-documenthandler-scripting">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Documents/dev/lib/boomi/container-documenthandler-scripting.jar!/" />
+      <root url="jar://$USER_HOME$/Documents/dev/lib/boomi/container-execution.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
