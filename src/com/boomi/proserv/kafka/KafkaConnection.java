@@ -33,7 +33,7 @@ import org.apache.kafka.common.TopicPartition;
  * 
  * KafkaConnection.getConnection("<Server>", true, <maxIdle>, <maxConnection>, <groupId>).sendDocuments("<topicName>", dataContext);
  * 
- * KafkaConnection.getConnection("<Server>", true, <maxIdle>, <maxConnection>, <groupId>).getDocuments("<topicName>", dataContext, <pollingTime in milliseconds>);
+ * KafkaConnection.getConnection("<Server>", true, <maxIdle>, <maxConnection>, <groupId>).getDocuments("<topicName>", dataContext, <pollingTime in milliseconds>, <assign Boolean>);
  * 
  * @author anthony.rabiaza
  *

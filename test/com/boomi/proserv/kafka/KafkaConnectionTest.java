@@ -7,19 +7,19 @@ class KafkaConnectionTest {
 
     public static void main(String[] args) {
         String serverHost 		= "boomi.antsoftware.org:9092";
-        String enablePolling 	= "true";
         String maxIdle 			= "1";
         String maxConnection 	= "20";
-        String topicName 		= "test-topic";
-        String message 			= "<test>Hello from java sent at " + new Date()+ "</test>";
+        String topicName 		= "test-topic2";
 
         KafkaConnection.setLocalExecution(true);
 
+        /* Message Sender */
+        String message = "<test>Hello from java sent at " + new Date()+ "</test>";
         System.out.println("Sending message...");
         try {
             KafkaConnection.getConnection(
                     serverHost,
-                    Boolean.parseBoolean(enablePolling),
+                    false,
                     Integer.parseInt(maxIdle),
                     Integer.parseInt(maxConnection)
             ).sendDocuments(topicName, message);
@@ -27,6 +27,8 @@ class KafkaConnectionTest {
             e.printStackTrace();
         }
         System.out.println("Message sent");
+        /* End of Message Sender */
+
 
         System.out.println("Sleeping for 5 sec...");
         try {
@@ -35,8 +37,10 @@ class KafkaConnectionTest {
             e.printStackTrace();
         }
 
-        String groupIp			= "consumers";	//Otherwise: org.apache.kafka.common.errors.InvalidGroupIdException: The configured groupId is invalid
-        int pollingTime 		= 60;
+        /* Message Receiver */
+        String groupId			= "consumers-123";	//Otherwise: org.apache.kafka.common.errors.InvalidGroupIdException: The configured groupId is invalid
+        String enablePolling 	= "true";
+        int pollingTime 		= 10;
 
         System.out.println("Polling topic...");
         try {
@@ -45,8 +49,8 @@ class KafkaConnectionTest {
                     Boolean.parseBoolean(enablePolling),
                     Integer.parseInt(maxIdle),
                     Integer.parseInt(maxConnection),
-                    groupIp
-            ).getDocuments(topicName, pollingTime, false);
+                    groupId
+            ).getDocuments(topicName, pollingTime, true);
             System.out.println("Polling done");
             if(documents.size()==0) {
                 System.out.println("No document returned");
@@ -58,5 +62,6 @@ class KafkaConnectionTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        /* End of Message Receiver */
     }
 }
