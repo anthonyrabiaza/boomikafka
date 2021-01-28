@@ -9,24 +9,29 @@ class KafkaConnectionTest {
         String serverHost 		= "boomi.antsoftware.org:9092";
         String maxIdle 			= "1";
         String maxConnection 	= "20";
-        String topicName 		= "test-topic2";
+        String topicName 		= "test-topic";
+
+        boolean send            = false;
+        boolean receive         = true;
 
         KafkaConnection.setLocalExecution(true);
 
         /* Message Sender */
-        String message = "<test>Hello from java sent at " + new Date()+ "</test>";
-        System.out.println("Sending message...");
-        try {
-            KafkaConnection.getConnection(
-                    serverHost,
-                    false,
-                    Integer.parseInt(maxIdle),
-                    Integer.parseInt(maxConnection)
-            ).sendDocuments(topicName, message);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(send) {
+            String message = "<test>Hello from java sent at " + new Date() + "</test>";
+            System.out.println("Sending message...");
+            try {
+                KafkaConnection.getConnection(
+                        serverHost,
+                        false,
+                        Integer.parseInt(maxIdle),
+                        Integer.parseInt(maxConnection)
+                ).sendDocuments(topicName, message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println("Message sent");
         }
-        System.out.println("Message sent");
         /* End of Message Sender */
 
 
@@ -38,29 +43,32 @@ class KafkaConnectionTest {
         }
 
         /* Message Receiver */
-        String groupId			= "consumers-123";	//Otherwise: org.apache.kafka.common.errors.InvalidGroupIdException: The configured groupId is invalid
+        String groupId			= "consumers-java";	//Otherwise: org.apache.kafka.common.errors.InvalidGroupIdException: The configured groupId is invalid
         String enablePolling 	= "true";
         int pollingTime 		= 10;
+        /* If groupId is created after the message push, no message will be deployed */
 
-        System.out.println("Polling topic...");
-        try {
-            List<String> documents = KafkaConnection.getConnection(
-                    serverHost,
-                    Boolean.parseBoolean(enablePolling),
-                    Integer.parseInt(maxIdle),
-                    Integer.parseInt(maxConnection),
-                    groupId
-            ).getDocuments(topicName, pollingTime, true);
-            System.out.println("Polling done");
-            if(documents.size()==0) {
-                System.out.println("No document returned");
-            } else {
-                for (int i = 0; i < documents.size(); i++) {
-                    System.out.println("Index " + i + ": " + documents.get(i));
+        if(receive) {
+            System.out.println("Polling topic...");
+            try {
+                List<String> documents = KafkaConnection.getConnection(
+                        serverHost,
+                        Boolean.parseBoolean(enablePolling),
+                        Integer.parseInt(maxIdle),
+                        Integer.parseInt(maxConnection),
+                        groupId
+                ).getDocuments(topicName, pollingTime, true);
+                System.out.println("Polling done");
+                if (documents.size() == 0) {
+                    System.out.println("No document returned");
+                } else {
+                    for (int i = 0; i < documents.size(); i++) {
+                        System.out.println("Index " + i + ": " + documents.get(i));
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         /* End of Message Receiver */
     }

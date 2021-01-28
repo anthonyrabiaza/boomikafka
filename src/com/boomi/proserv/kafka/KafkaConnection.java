@@ -198,7 +198,7 @@ public class KafkaConnection {
 				msg = record.value();
 				documents.add(msg);
 			}
-
+			consumer.commitAsync();
 			return documents;
 		} finally {
 			if(pooling) {
