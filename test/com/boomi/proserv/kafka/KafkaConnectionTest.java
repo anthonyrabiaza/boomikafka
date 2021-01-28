@@ -1,5 +1,6 @@
 package com.boomi.proserv.kafka;
 
+import java.util.Date;
 import java.util.List;
 
 class KafkaConnectionTest {
@@ -10,10 +11,11 @@ class KafkaConnectionTest {
         String maxIdle 			= "1";
         String maxConnection 	= "20";
         String topicName 		= "test-topic";
-        String message 			= "<test>hellofromjava</test>";
+        String message 			= "<test>Hello from java sent at " + new Date()+ "</test>";
 
         KafkaConnection.setLocalExecution(true);
 
+        System.out.println("Sending message...");
         try {
             KafkaConnection.getConnection(
                     serverHost,
@@ -24,9 +26,19 @@ class KafkaConnectionTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("Message sent");
+
+        System.out.println("Sleeping for 5 sec...");
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         String groupIp			= "consumers";	//Otherwise: org.apache.kafka.common.errors.InvalidGroupIdException: The configured groupId is invalid
-        int pollingTime 		= 60000;
+        int pollingTime 		= 60;
+
+        System.out.println("Polling topic...");
         try {
             List<String> documents = KafkaConnection.getConnection(
                     serverHost,
@@ -34,10 +46,14 @@ class KafkaConnectionTest {
                     Integer.parseInt(maxIdle),
                     Integer.parseInt(maxConnection),
                     groupIp
-            ).getDocuments(topicName, pollingTime);
-
-            for (int i = 0; i < documents.size(); i++) {
-                System.out.println("Index "+i+": "+documents.get(i));
+            ).getDocuments(topicName, pollingTime, false);
+            System.out.println("Polling done");
+            if(documents.size()==0) {
+                System.out.println("No document returned");
+            } else {
+                for (int i = 0; i < documents.size(); i++) {
+                    System.out.println("Index " + i + ": " + documents.get(i));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

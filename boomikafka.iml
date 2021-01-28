@@ -74,6 +74,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="kafka-clients-1.0.1-kafka-3.1.1" level="project" />
+    <orderEntry type="library" name="kafka-clients-2.7.0" level="project" />
   </component>
 </module>

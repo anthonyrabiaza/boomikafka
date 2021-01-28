@@ -3,6 +3,7 @@ package com.boomi.proserv.kafka;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -21,6 +22,7 @@ import com.boomi.proserv.kafka.pooling.ConsumerFactory;
 import com.boomi.proserv.kafka.pooling.ConsumerPool;
 import com.boomi.proserv.kafka.pooling.ProducerFactory;
 import com.boomi.proserv.kafka.pooling.ProducerPool;
+import org.apache.kafka.common.TopicPartition;
 
 /**
  * KafkaConnection.getConnection("<Server>").sendDocuments("<topicName>", dataContext);
@@ -167,21 +169,29 @@ public class KafkaConnection {
 		}
 	}
 
-	public void getDocuments(String topicName, DataContextImpl dataContext, int pollingTime) throws Exception {
-		List<String> documents = getDocuments(topicName, pollingTime);
+	public void getDocuments(String topicName, DataContextImpl dataContext, int pollingTime, boolean assign) throws Exception {
+		List<String> documents = getDocuments(topicName, pollingTime, assign);
 		for (int i = 0; i < documents.size(); i++) {
 			dataContext.storeStream(new ByteArrayInputStream(documents.get(i).getBytes()), new Properties());
 		}
 	}
 
-	public List<String> getDocuments(String topicName, int pollingTime) throws Exception {
+	public List<String> getDocuments(String topicName, int pollingTime, boolean assign) throws Exception {
 		Consumer<String, String> consumer = getConsumer();
 		List<String> documents = new ArrayList<String>();
 		try {
 			// Get records from topic
-			consumer.subscribe(Arrays.asList(topicName));
-			ConsumerRecords<String, String> records = consumer.poll(pollingTime);
-
+			getLogger().info("Subscribing to topic "+topicName+"...");
+			if(assign) {
+				TopicPartition topicPartition = new TopicPartition(topicName, 0);
+				List<TopicPartition> topicPartitions = Arrays.asList(topicPartition);
+				consumer.assign(topicPartitions);
+			} else {
+				consumer.subscribe(Arrays.asList(topicName));
+			}
+			getLogger().info("Polling for "+pollingTime+" seconds...");
+			ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(pollingTime));
+			getLogger().info("Record received");
 			// Get each record value
 			String msg = "";
 			for (ConsumerRecord<String, String> record : records) {
